@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bff3fa3226c7f144191f83951de88869, type: 3}
+  m_Name: ScenarioConfig
+  m_EditorClassIdentifier: PassAR.Runtime::PassAR.ScenarioConfig
+  zoneSeconds: 3
+  minDist: 1
+  maxDist: 3
+  maxRayLength: 6
+  aimHoldSeconds: 0.5
+  aimLostGrace: 1
+  errorPenalty: 10
+  maxSavedSessions: 50
