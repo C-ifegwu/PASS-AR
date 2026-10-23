@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -6,8 +7,8 @@ using UnityEngine.UI;
 namespace PassAR
 {
     /// <summary>
-    /// Everything the user sees and taps. Contains no simulation logic: it shows
-    /// what it is told and raises events when buttons are used.
+    /// Everything the user sees and taps. It makes no training decisions. It shows
+    /// what it is told and announces when a button is pressed.
     /// </summary>
     public class UIManager : MonoBehaviour
     {
@@ -27,37 +28,39 @@ namespace PassAR
         [SerializeField] private Button howToBackButton;
         [SerializeField] private Button settingsBackButton;
         [SerializeField] private Button soundToggleButton;
-        [SerializeField] private Text soundToggleLabel;
+        [SerializeField] private TMP_Text soundToggleLabel;
         [SerializeField] private Button clearButton;
-        [SerializeField] private Text clearLabel;
-        [SerializeField] private Text menuBestText;
-        [SerializeField] private Text rulesText;
-        [SerializeField] private Text savedInfoText;
+        [SerializeField] private TMP_Text clearLabel;
+        [SerializeField] private TMP_Text menuBestText;
+        [SerializeField] private TMP_Text rulesText;
+        [SerializeField] private TMP_Text savedInfoText;
         [SerializeField] private Button menuButton;
+        [SerializeField] private Button[] extinguisherButtons;
+        [SerializeField] private Image[] extinguisherButtonImages;
 
         [Header("Welcome / permission")]
         [SerializeField] private Button startButton;
         [SerializeField] private Button retryButton;
-        [SerializeField] private Text permissionMessage;
-        [SerializeField] private Text busyText;
+        [SerializeField] private TMP_Text permissionMessage;
+        [SerializeField] private TMP_Text busyText;
 
         [Header("HUD")]
-        [SerializeField] private Text instructionText;
-        [SerializeField] private Text messageText;
-        [SerializeField] private Text timerText;
+        [SerializeField] private TMP_Text instructionText;
+        [SerializeField] private TMP_Text messageText;
+        [SerializeField] private TMP_Text timerText;
         [SerializeField] private Button pullPinButton;
         [SerializeField] private HoldButton squeezeButton;
         [SerializeField] private Image squeezeImage;
         [SerializeField] private Button muteButton;
-        [SerializeField] private Text muteLabel;
+        [SerializeField] private TMP_Text muteLabel;
         [SerializeField] private GameObject reticle;
         [SerializeField] private GameObject actionButtons;
 
         [Header("Summary")]
-        [SerializeField] private Text summaryTime;
-        [SerializeField] private Text summaryErrors;
-        [SerializeField] private Text summaryScore;
-        [SerializeField] private Text summaryBest;
+        [SerializeField] private TMP_Text summaryTime;
+        [SerializeField] private TMP_Text summaryErrors;
+        [SerializeField] private TMP_Text summaryScore;
+        [SerializeField] private TMP_Text summaryBest;
         [SerializeField] private Button restartButton;
 
         public event Action StartPressed;
@@ -70,10 +73,11 @@ namespace PassAR
         public event Action MenuPressed;
         public event Action ClearHistoryPressed;
         public event Action QuitPressed;
+        public event Action<int> ExtinguisherChosen;
 
-        private static readonly Color WarningColor = new Color(1f, 0.45f, 0.4f);
-        private static readonly Color HintColor = new Color(1f, 0.72f, 0.42f);
-        private static readonly Color FeedbackColor = new Color(0.55f, 1f, 0.6f);
+        private static readonly Color WarningColor = Theme.Danger;
+        private static readonly Color HintColor = Theme.Accent2;
+        private static readonly Color FeedbackColor = Theme.Success;
 
         private const float WarningSeconds = 2.5f;
         private const float FeedbackSeconds = 1.5f;
@@ -100,6 +104,11 @@ namespace PassAR
             howToBackButton.onClick.AddListener(ShowWelcome);
             settingsBackButton.onClick.AddListener(ShowWelcome);
             clearButton.onClick.AddListener(OnClearPressed);
+            for (int i = 0; i < extinguisherButtons.Length; i++)
+            {
+                int index = i;
+                extinguisherButtons[i].onClick.AddListener(() => ExtinguisherChosen?.Invoke(index));
+            }
             squeezeButton.Pressed += () => SqueezeDown?.Invoke();
             squeezeButton.Released += () => SqueezeUp?.Invoke();
 
@@ -108,7 +117,7 @@ namespace PassAR
 
         private void Update()
         {
-            // Android Back key (Escape in the Input System) leaves How to play and Settings.
+            // The Android Back button (Escape key in the editor) leaves How to Play and Settings.
             Keyboard keyboard = Keyboard.current;
             if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame &&
                 (howToPanel.activeSelf || settingsPanel.activeSelf))
@@ -116,7 +125,7 @@ namespace PassAR
 
             if (clearArmedUntil > 0f && Time.unscaledTime > clearArmedUntil) DisarmClear();
 
-            // Warnings and feedback win over the hint; the hint stays until cleared.
+            // Warnings and feedback are shown before the hint. The hint stays until it is cleared.
             if (Time.unscaledTime < transientUntil)
             {
                 messageText.text = transientText;
@@ -159,9 +168,20 @@ namespace PassAR
             ShowOnly(settingsPanel);
         }
 
+        public void SetExtinguisherChoice(int index)
+        {
+            for (int i = 0; i < extinguisherButtonImages.Length; i++)
+            {
+                bool on = i == index;
+                extinguisherButtonImages[i].color = on ? Theme.Accent : Theme.Surface2;
+                TMP_Text label = extinguisherButtons[i].GetComponentInChildren<TMP_Text>();
+                label.color = on ? Theme.OnAccent : Theme.TextMuted;
+            }
+        }
+
         public void SetBestScore(int best)
         {
-            menuBestText.text = best >= 0 ? "Best score: " + best + " / 100" : "No completed training yet";
+            menuBestText.text = best >= 0 ? "BEST SCORE  " + best + " / 100" : "NO COMPLETED TRAINING YET";
         }
 
         public void SetSettingsInfo(string rules, int savedSessions, int maxSessions)
@@ -261,9 +281,9 @@ namespace PassAR
 
         public void SetSqueezeLooksEnabled(bool enabled)
         {
-            // The button still receives presses when "disabled" so that pressing it
-            // too early can be counted as an out-of-order action (FR-07, FR-12).
-            squeezeImage.color = enabled ? new Color(0.75f, 0.22f, 0.17f) : new Color(0.35f, 0.35f, 0.37f);
+            // The button still receives presses when it looks "disabled" so that pressing it
+            // too early can be counted as a mistake.
+            squeezeImage.color = enabled ? Theme.Danger : Theme.Surface2;
         }
 
         public void SetMuteLabel(bool muted)
@@ -286,10 +306,10 @@ namespace PassAR
             actionButtons.SetActive(false);
             reticle.SetActive(false);
 
-            summaryTime.text = "Time: " + record.durationSec.ToString("0.0") + " s";
-            summaryErrors.text = "Errors: " + record.errors;
-            summaryScore.text = "Score: " + record.score + " / 100";
-            summaryBest.text = bestScore >= 0 ? "Best score: " + bestScore : "";
+            summaryTime.text = "TIME  <color=#F4F5F7>" + record.durationSec.ToString("0.0") + " s</color>";
+            summaryErrors.text = "ERRORS  <color=#F4F5F7>" + record.errors + "</color>";
+            summaryScore.text = record.score + "<size=32%><color=#A9AFBA> / 100</color></size>";
+            summaryBest.text = bestScore >= 0 ? "BEST SCORE  " + bestScore : "";
             ShowInstruction(record.errors == 0
                 ? "Well done - fire out with no mistakes."
                 : "Fire out. Try again to improve your score.");

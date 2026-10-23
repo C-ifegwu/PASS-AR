@@ -6,17 +6,20 @@ using UnityEngine.Pool;
 namespace PassAR
 {
     /// <summary>
-    /// The virtual extinguisher held in front of the camera. It knows its own
-    /// pin and spray state, works out what the reticle points at, and applies
-    /// the agent to the fire zone it hits. Which actions are allowed at a given
-    /// moment is decided by TaskManager, not here.
+    /// The pretend extinguisher held in front of the camera. It knows whether its pin is out
+    /// and whether it is spraying, works out what you are pointing at, and puts out the
+    /// fire zone it hits. Which actions are allowed at any moment is decided by TaskManager.
     /// </summary>
     public class Extinguisher : MonoBehaviour
     {
         [SerializeField] private Camera arCamera;
         [SerializeField] private ParticleSystem sprayParticles;
         [SerializeField] private ParticleSystem puffPrefab;
-        [SerializeField] private GameObject pinVisual;
+        [SerializeField] private GameObject[] models;
+        [SerializeField] private GameObject[] pinVisuals;
+        [SerializeField] private Transform[] nozzles;
+        [SerializeField] private Transform sprayEmitter;
+        private GameObject pinVisual;
 
         private const float PuffInterval = 0.2f;
         private const float PuffLifetime = 0.9f;
@@ -61,6 +64,17 @@ namespace PassAR
                     defaultCapacity: 6,
                     maxSize: 12);
             }
+        }
+
+        /// <summary>Shows one of the two extinguishers (level 1 or level 2) and moves the spray to its nozzle.</summary>
+        public void SelectModel(int index)
+        {
+            if (models == null || models.Length == 0) return;
+            index = Mathf.Clamp(index, 0, models.Length - 1);
+            for (int i = 0; i < models.Length; i++) models[i].SetActive(i == index);
+            pinVisual = pinVisuals[index];
+            if (sprayEmitter != null && nozzles[index] != null)
+                sprayEmitter.position = nozzles[index].position;
         }
 
         public void PullPin()
@@ -108,7 +122,7 @@ namespace PassAR
             SetEmission(false);
         }
 
-        /// <summary>Casts a ray through the centre of the screen and checks distance (FR-08).</summary>
+        /// <summary>Looks straight ahead from the middle of the screen and checks how far away the fire is.</summary>
         public AimInfo AimRay()
         {
             return ComputeAim();

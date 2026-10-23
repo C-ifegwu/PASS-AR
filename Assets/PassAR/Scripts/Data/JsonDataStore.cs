@@ -6,9 +6,9 @@ using UnityEngine;
 namespace PassAR
 {
     /// <summary>
-    /// One small JSON file per finished attempt: session_[timestamp].json.
-    /// Only the newest maxFiles are kept. Files are written to a temporary
-    /// name first and renamed, so a failed write never leaves a half file.
+    /// One small text file for each finished attempt, named session_[time].json.
+    /// Only the newest files are kept. Each file is saved under a temporary name first and
+    /// then renamed, so a failed save never leaves a half-written file.
     /// </summary>
     public class JsonDataStore : IDataStore
     {
@@ -58,7 +58,7 @@ namespace PassAR
             return records;
         }
 
-        /// <summary>Deletes every saved session (Settings > Clear saved results).</summary>
+        /// <summary>Deletes every saved result (Settings, Clear saved results).</summary>
         public void Clear()
         {
             if (!Directory.Exists(folder)) return;

@@ -3,16 +3,16 @@ using UnityEngine;
 namespace PassAR
 {
     /// <summary>
-    /// One third of the fire (left, centre or right). Intensity goes from 1 to 0
-    /// and the flames shrink with it. The collider sits at the base of the flames.
+    /// One third of the fire (left, centre or right). Its strength goes from 1 to 0
+    /// and the flames shrink with it. The invisible hit box sits at the base of the flames.
     /// </summary>
     public class FireZone : MonoBehaviour
     {
-        [SerializeField] private ParticleSystem flames;
+        [SerializeField] private Transform flameRoot;
 
         private float intensity = 1f;
-        private float baseRate;
-        private float baseSize;
+        private Vector3 baseScale;
+        private ParticleSystem[] systems;
 
         public Hazard Owner { get; private set; }
         public int Id { get; private set; }
@@ -20,9 +20,8 @@ namespace PassAR
 
         private void Awake()
         {
-            var emission = flames.emission;
-            baseRate = emission.rateOverTime.constant;
-            baseSize = flames.main.startSize.constant;
+            baseScale = flameRoot.localScale;
+            systems = flameRoot.GetComponentsInChildren<ParticleSystem>(true);
         }
 
         public void Bind(Hazard owner, int id)
@@ -51,19 +50,14 @@ namespace PassAR
 
         private void ApplyVisuals()
         {
-            var emission = flames.emission;
-            emission.rateOverTime = baseRate * intensity;
+            flameRoot.localScale = baseScale * Mathf.Lerp(0.3f, 1f, intensity);
 
-            var main = flames.main;
-            main.startSize = baseSize * Mathf.Lerp(0.35f, 1f, intensity);
-
-            if (IsOut())
+            for (int i = 0; i < systems.Length; i++)
             {
-                flames.Stop(true, ParticleSystemStopBehavior.StopEmitting);
-            }
-            else if (!flames.isPlaying)
-            {
-                flames.Play();
+                if (IsOut())
+                    systems[i].Stop(false, ParticleSystemStopBehavior.StopEmitting);
+                else if (!systems[i].isPlaying)
+                    systems[i].Play(false);
             }
         }
     }

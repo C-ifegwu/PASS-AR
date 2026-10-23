@@ -45,7 +45,7 @@ namespace PassAR
             loopSource.Play();
         }
 
-        /// <summary>Mutes everything, including the fire sound that lives on the fire itself (FR-20).</summary>
+        /// <summary>Turns all sound off, including the fire crackle.</summary>
         public void SetMuted(bool muted)
         {
             AudioListener.volume = muted ? 0f : 1f;

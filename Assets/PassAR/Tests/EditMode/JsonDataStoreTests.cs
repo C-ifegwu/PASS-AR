@@ -76,7 +76,7 @@ namespace PassAR.Tests
             var loaded = store.LoadAll();
 
             Assert.AreEqual(3, loaded.Count);
-            Assert.AreEqual(3, loaded[0].score); // 1 and 2 were pruned
+            Assert.AreEqual(3, loaded[0].score); // results 1 and 2 were removed
         }
 
         [Test]

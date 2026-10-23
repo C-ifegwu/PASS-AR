@@ -76,7 +76,7 @@ namespace PassAR.Tests
         public void Steps_AreNeverSkipped()
         {
             TaskManager manager = Start(out var steps);
-            steps[2].Done = true; // a later step reporting done must not matter
+            steps[2].Done = true; // a later step saying it is done must not matter
             manager.Tick(0.1f);
             Assert.AreSame(steps[0], manager.CurrentStep);
         }

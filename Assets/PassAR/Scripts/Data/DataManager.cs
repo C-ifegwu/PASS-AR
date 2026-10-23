@@ -5,9 +5,8 @@ using UnityEngine;
 namespace PassAR
 {
     /// <summary>
-    /// The only class that reads or writes stored data: the scenario config,
-    /// the mute setting and the saved sessions. A storage failure never stops
-    /// the simulation.
+    /// The only script that reads or writes saved information: the settings,
+    /// the sound setting and the saved results. If saving fails, the training still carries on.
     /// </summary>
     public class DataManager : MonoBehaviour
     {
@@ -28,6 +27,19 @@ namespace PassAR
             return config;
         }
 
+        private const string ExtinguisherKey = "extinguisher";
+
+        public int LoadExtinguisher()
+        {
+            return PlayerPrefs.GetInt(ExtinguisherKey, 0);
+        }
+
+        public void SaveExtinguisher(int index)
+        {
+            PlayerPrefs.SetInt(ExtinguisherKey, index);
+            PlayerPrefs.Save();
+        }
+
         public bool LoadMuted()
         {
             return PlayerPrefs.GetInt(MutedKey, 0) == 1;
@@ -39,7 +51,7 @@ namespace PassAR
             PlayerPrefs.Save();
         }
 
-        /// <summary>Returns false if the file could not be written (FR-18).</summary>
+        /// <summary>Returns false if the result could not be saved.</summary>
         public bool SaveSession(SessionRecord record)
         {
             try

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace PassAR
 {
     /// <summary>
-    /// Runs the PASS steps in order, counts errors, measures time and builds
-    /// the SessionRecord. Plain C# class (no MonoBehaviour) so it can be unit tested.
+    /// Runs the PASS steps one after another, counts mistakes, measures time and builds
+    /// the result. It is a plain class (not attached to an object) so it is easy to test.
     /// </summary>
     public class TaskManager
     {
@@ -99,8 +99,8 @@ namespace PassAR
         }
 
         /// <summary>
-        /// Called when the user presses Squeeze. Returns true if spraying is allowed now;
-        /// otherwise the press is ignored and counted as one error (FR-07, FR-12).
+        /// Called when the user presses Squeeze. Returns true if spraying is allowed now.
+        /// If not, the press is ignored and counts as one mistake.
         /// </summary>
         public bool TrySqueeze()
         {
@@ -125,7 +125,7 @@ namespace PassAR
             };
         }
 
-        /// <summary>100 minus the penalty per error, never below 0 (FR-15).</summary>
+        /// <summary>100 minus the penalty for each mistake. It never goes below 0.</summary>
         public static int CalculateScore(int errors, int penaltyPerError)
         {
             int score = 100 - errors * penaltyPerError;

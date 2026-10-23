@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace PassAR
 {
-    /// <summary>Where finished sessions are kept. Swap the implementation to change storage.</summary>
+    /// <summary>Where finished results are kept. Another way of saving can be used by swapping this part.</summary>
     public interface IDataStore
     {
         void Save(SessionRecord record);

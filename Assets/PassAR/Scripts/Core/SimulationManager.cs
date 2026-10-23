@@ -4,9 +4,9 @@ using UnityEngine;
 namespace PassAR
 {
     /// <summary>
-    /// Coordinator of the whole app. It owns the state, wires the managers
-    /// together through their events and never does their work itself.
-    /// Only this class is a singleton.
+    /// The boss of the app. It knows which stage the app is in and passes
+    /// messages between the other scripts. It never does their work itself.
+    /// There is only ever one of these.
     /// </summary>
     public class SimulationManager : MonoBehaviour
     {
@@ -53,6 +53,9 @@ namespace PassAR
             bool muted = data.LoadMuted();
             audioManager.SetMuted(muted);
             ui.SetMuteLabel(muted);
+            int chosen = data.LoadExtinguisher();
+            extinguisher.SelectModel(chosen);
+            ui.SetExtinguisherChoice(chosen);
 
             Subscribe();
             RefreshMenuData();
@@ -71,10 +74,12 @@ namespace PassAR
             ui.MenuPressed += GoToMenu;
             ui.ClearHistoryPressed += OnClearHistory;
             ui.QuitPressed += OnQuit;
+            ui.ExtinguisherChosen += OnExtinguisherChosen;
 
             arController.CameraPermissionResult += OnCameraResult;
             arController.SessionFailed += OnSessionFailed;
             arController.ScenarioPlaced += OnScenarioPlaced;
+            arController.PlacementMissed += OnPlacementMissed;
             arController.TrackingChanged += OnTrackingChanged;
 
             extinguisher.PinPulled += OnPinPulled;
@@ -95,12 +100,14 @@ namespace PassAR
                 ui.MenuPressed -= GoToMenu;
                 ui.ClearHistoryPressed -= OnClearHistory;
                 ui.QuitPressed -= OnQuit;
+                ui.ExtinguisherChosen -= OnExtinguisherChosen;
             }
             if (arController != null)
             {
                 arController.CameraPermissionResult -= OnCameraResult;
                 arController.SessionFailed -= OnSessionFailed;
                 arController.ScenarioPlaced -= OnScenarioPlaced;
+                arController.PlacementMissed -= OnPlacementMissed;
                 arController.TrackingChanged -= OnTrackingChanged;
             }
             if (extinguisher != null)
@@ -119,7 +126,7 @@ namespace PassAR
             UpdateAimHint();
         }
 
-        // ---- start up and camera ------------------------------------------------
+        // ---- start and camera ------------------------------------------------
 
         private void OnStartPressed()
         {
@@ -151,6 +158,11 @@ namespace PassAR
         }
 
         // ---- placement and scenario ---------------------------------------------
+
+        private void OnPlacementMissed()
+        {
+            ui.ShowWarning("No floor found yet - keep moving the phone slowly, then tap the floor");
+        }
 
         private void OnScenarioPlaced(FireHazard placed)
         {
@@ -287,7 +299,7 @@ namespace PassAR
         {
             if (state != SimState.Summary) return;
 
-            // FR-17: reset zones, step progress and timer in place; the fire stays where it was placed.
+            // Try Again: put the fire out of its burnt state, restart the steps and the timer. The fire stays where it was placed.
             hazard.ResetHazard();
             ui.HideSummary();
             StartScenario();
@@ -322,6 +334,13 @@ namespace PassAR
         private void OnQuit()
         {
             Application.Quit();
+        }
+
+        private void OnExtinguisherChosen(int index)
+        {
+            data.SaveExtinguisher(index);
+            extinguisher.SelectModel(index);
+            ui.SetExtinguisherChoice(index);
         }
 
         private void RefreshMenuData()

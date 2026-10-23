@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace PassAR
 {
-    /// <summary>A small bin fire made of three zones with a crackling sound that fades as it dies.</summary>
+    /// <summary>The fire: three burning zones with a crackling sound that gets quieter as the fire dies.</summary>
     public class FireHazard : Hazard
     {
         [SerializeField] private AudioClip fireSound;

@@ -1,6 +1,6 @@
 namespace PassAR
 {
-    /// <summary>What the centre-screen reticle is pointing at this frame.</summary>
+    /// <summary>What the circle in the middle of the screen is pointing at right now.</summary>
     public struct AimInfo
     {
         public FireZone Zone;
@@ -9,7 +9,7 @@ namespace PassAR
 
         public bool HitsZone => Zone != null;
 
-        /// <summary>On a fire zone base and inside the safe distance range (FR-08).</summary>
+        /// <summary>Pointing at the base of a fire zone and standing at a safe distance.</summary>
         public bool Valid => HitsZone && DistanceOk;
     }
 }

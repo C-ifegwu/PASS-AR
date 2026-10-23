@@ -6,7 +6,9 @@
     "Unity.XR.ARSubsystems",
     "Unity.XR.CoreUtils",
     "Unity.InputSystem",
-    "UnityEngine.UI"
+    "UnityEngine.UI",
+    "Unity.TextMeshPro",
+    "Unity.XR.Management"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

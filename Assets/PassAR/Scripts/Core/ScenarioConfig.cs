@@ -3,8 +3,8 @@ using UnityEngine;
 namespace PassAR
 {
     /// <summary>
-    /// Every tunable number in the simulation. Nothing else in the code base
-    /// hard-codes these values (NFR-08). Bundled in the build as an asset.
+    /// Every number you might want to change in the training lives here.
+    /// No other script has these numbers written inside it.
     /// </summary>
     [CreateAssetMenu(fileName = "ScenarioConfig", menuName = "PASS-AR/Scenario Config")]
     public class ScenarioConfig : ScriptableObject

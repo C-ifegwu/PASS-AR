@@ -5,8 +5,8 @@ using UnityEngine;
 namespace PassAR
 {
     /// <summary>
-    /// Something the trainee has to deal with. Today there is only FireHazard,
-    /// but the managers only know this base class.
+    /// Something the trainee has to deal with. Right now this is only a fire,
+    /// but the other scripts only know this general outline, so other dangers could be added.
     /// </summary>
     public abstract class Hazard : MonoBehaviour
     {
@@ -40,7 +40,7 @@ namespace PassAR
             extinguishSeconds = Mathf.Max(0.1f, secondsToExtinguishZone);
         }
 
-        /// <summary>Applies extinguishing agent to one zone for dt seconds (FR-10).</summary>
+        /// <summary>Sprays one zone for dt seconds, which weakens its fire.</summary>
         public void ApplyAgent(int zoneId, float dt)
         {
             if (zoneId < 0 || zoneId >= zones.Count) return;

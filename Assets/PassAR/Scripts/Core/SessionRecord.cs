@@ -3,8 +3,8 @@ using System;
 namespace PassAR
 {
     /// <summary>
-    /// One finished attempt. Serialised with JsonUtility, so public fields only.
-    /// stepTimes order: Pull, Aim, Squeeze, Sweep.
+    /// The result of one finished attempt. It is saved as a small text file,
+    /// so every field is public. stepTimes holds the seconds spent in Pull, Aim, Squeeze, Sweep.
     /// </summary>
     [Serializable]
     public class SessionRecord
